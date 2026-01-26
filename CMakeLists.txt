@@ -30,6 +30,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	#add the os specific code
 	list(APPEND DNS_SOURCES "src/windows/bonjourbrowser.cpp" "src/windows/bonjourpublisher.cpp")
 endif()
 
@@ -41,14 +42,23 @@ target_include_directories(pml_dnssd PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(pml_dnssd PUBLIC ${DIR_LOG}/include)
 target_include_directories(pml_dnssd PUBLIC ${CMAKE_BINARY_DIR}/include)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	add_dependencies(pml_dnssd pml_log)
+	target_include_directories(pml_dnssd PRIVATE "mdnssd")
+	target_link_directories(pml_dnssd PRIVATE "bin")
+	target_link_directories(pml_dnssd PRIVATE "mdnssd/windows")
+	target_link_libraries(pml_dnssd optimized pml_log debug pml_logd)
+	target_link_libraries(pml_dnssd dnssd ws2_32 iphlpapi)
+endif()
+
 list(APPEND flags "-fPIC" "-Wall" "-fpermissive"  "-std=c++17")
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
    list(APPEND flags "-O3")
-   target_compile_definitions(pml_dnssd PUBLIC NDEBUG DLL_EXPORTS _MSL_STDINT_H)
+   target_compile_definitions(pml_dnssd PUBLIC NDEBUG DNSSD_DLL _MSL_STDINT_H)
 else()
    list(APPEND flags "-g")
-   target_compile_definitions(pml_dnssd PUBLIC DEBUG DLL_EXPORTS _MSL_STDINT_H)
+   target_compile_definitions(pml_dnssd PUBLIC DEBUG DNSSD_DLL _MSL_STDINT_H)
 endif()
 
 target_compile_options(pml_dnssd PRIVATE ${flags})
@@ -58,13 +68,15 @@ target_link_libraries(pml_dnssd avahi-client)
 
 #linux specific
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	target_compile_definitions(pml_dnssd PRIVATE __GNU__)
+	target_compile_definitions(pml_dnssd PUBLIC _GNU)
 	target_link_libraries(pml_dnssd pthread)
+	target_link_libraries(pml_dnssd avahi-client)
 endif()
 
 set_target_properties(pml_dnssd PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/)
 
 #linux specific
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	install(TARGETS pml_dnssd LIBRARY DESTINATION /usr/local/lib)
+	set(CMAKE_INSTALL_PREFIX "/usr/local")
+	install(TARGETS pml_dnssd LIBRARY DESTINATION lib)
 endif()
