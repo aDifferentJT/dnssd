@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(pml_dnssd LANGUAGES CXX VERSION 1.2.1)
-include(FetchContent)
+
+include(addexternal.cmake)
 
 message(STATUS "----pml/dnssd ----")
 
-execute_process(COMMAND ${CMAKE_COMMAND} -DNAMESPACE=dnssd -DMAJOR=${PROJECT_VERSION_MAJOR} -DMINOR=${PROJECT_VERSION_MINOR} -DPATCH=${PROJECT_VERSION_PATCH} -P ${CMAKE_CURRENT_SOURCE_DIR}/version.cmake)
+execute_process(COMMAND ${CMAKE_COMMAND} -DNAMESPACE=${PROJECT_NAME} -DMAJOR=${PROJECT_VERSION_MAJOR} -DMINOR=${PROJECT_VERSION_MINOR} -DPATCH=${PROJECT_VERSION_PATCH} -DOUTPUT=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/version.cmake)
 
 SET(DIR_BASE ${CMAKE_SOURCE_DIR} CACHE STRING "base location for libraries")
 SET(DIR_LOG ${DIR_BASE}/external/log CACHE STRING "location of pml log")
 
-FetchContent_Declare(log GIT_REPOSITORY "https://github.com/martim01/log.git"  SOURCE_DIR ${DIR_LOG})
-
-FetchContent_GetProperties(log)
-if(NOT log_POPULATED)
-	FetchContent_MakeAvailable(asio)
-endif()
+add_external_library(log ${DIR_LOG} "https://github.com/martim01/log.git" "" FALSE)
 
 list(APPEND DNS_SOURCES "src/dnssd.cpp"  "src/zcposter.cpp")
 
@@ -38,7 +34,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 
-add_library(pml_dnssd SHARED ${DNS_SOURCES} ${CMAKE_BINARY_DIR}/src/dnssd_version.cpp)
+add_library(pml_dnssd SHARED ${DNS_SOURCES} ${CMAKE_BINARY_DIR}/src/pml_dnssd_version.cpp)
 set_target_properties(pml_dnssd PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(pml_dnssd PUBLIC ${PROJECT_SOURCE_DIR}/include)
@@ -56,7 +52,7 @@ else()
 endif()
 
 target_compile_options(pml_dnssd PRIVATE ${flags})
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+target_link_directories(pml_dnssd PRIVATE ${CMAKE_SOURCE_DIR}/lib)
 target_link_libraries(pml_dnssd optimized pml_log debug pml_logd)
 target_link_libraries(pml_dnssd avahi-client)
 
