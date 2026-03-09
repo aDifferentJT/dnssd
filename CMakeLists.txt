@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(pml_dnssd LANGUAGES CXX VERSION 1.2.1)
 
-include(addexternal.cmake)
+include(${CMAKE_SOURCE_DIR}/addexternal.cmake)
 
 message(STATUS "----pml/dnssd ----")
 
@@ -10,7 +10,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -DNAMESPACE=${PROJECT_NAME} -DMAJOR=${P
 SET(DIR_BASE ${CMAKE_SOURCE_DIR} CACHE STRING "base location for libraries")
 SET(DIR_LOG ${DIR_BASE}/external/log CACHE STRING "location of pml log")
 
-add_external_library(log ${DIR_LOG} "https://github.com/martim01/log.git" "" FALSE)
+add_external_library(log ${DIR_LOG} "https://github.com/martim01/log.git" "" FALSE "CMakeLists.txt")
 
 list(APPEND DNS_SOURCES "src/dnssd.cpp"  "src/zcposter.cpp")
 
