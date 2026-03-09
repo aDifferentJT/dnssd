@@ -10,7 +10,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -DNAMESPACE=${PROJECT_NAME} -DMAJOR=${P
 SET(DIR_BASE ${CMAKE_SOURCE_DIR} CACHE STRING "base location for libraries")
 SET(DIR_LOG ${DIR_BASE}/external/log CACHE STRING "location of pml log")
 
-add_external_library(log ${DIR_LOG} "https://github.com/martim01/log.git" "" FALSE "CMakeLists.txt")
+add_external_library(log ${DIR_LOG} "martim01/log" "" FALSE "CMakeLists.txt")
 
 list(APPEND DNS_SOURCES "src/dnssd.cpp"  "src/zcposter.cpp")
 
