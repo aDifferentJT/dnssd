@@ -1,7 +1,13 @@
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #include "bonjourpublisher.h"
 #include <sstream>
 #include <thread>
+
+#ifdef __APPLE__
+#include <arpa/inet.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#endif
 
 #include "log.h"
 

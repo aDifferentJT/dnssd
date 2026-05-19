@@ -2,13 +2,13 @@
 
 #include "servicepublisher.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #include "bonjourbrowser.h"
 #include "bonjourpublisher.h"
-#else
+#elifdef __linux__
 #include "avahibrowser.h"
 #include "avahipublisher.h"
-#endif // __WIN32__
+#endif
 
 
 namespace pml::dnssd
@@ -39,11 +39,11 @@ namespace pml::dnssd
     }
 
     Publisher::Publisher() :
-        #ifdef _WIN32
+        #if defined(_WIN32) || defined(__APPLE__)
             m_pPublisher(std::make_unique<BonjourPublisher>())
-        #else
+        #elifdef __linux__
             m_pPublisher(std::make_unique<AvahiPublisher>())
-        #endif // _WIN32
+        #endif
     {
     }
 

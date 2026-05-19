@@ -1,7 +1,7 @@
 #ifndef PML_DNSSD_BONJOURPUBLISHER_H
 #define PML_DNSSD_BONJOURPUBLISHER_H
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #include <atomic>
 #include <map>
 #include <memory>

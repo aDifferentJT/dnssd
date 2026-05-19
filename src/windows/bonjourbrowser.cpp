@@ -3,9 +3,16 @@
 #include <iostream>
 #include <thread>
 
+#ifdef _WIN32
 #include <iphlpapi.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#elifdef __APPLE__
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#endif
 
 #include "zcposter.h"
 
@@ -261,13 +268,22 @@ namespace pml::dnssd
                 itInstance->second->sHostName = hosttarget;
 
                 DNSServiceRef client = NULL;
+                std::string sAdapter = "Unknown";
+#ifdef _WIN32
                 MIB_IFROW IfRow;
                 IfRow.dwIndex = interfaceIndex;
                 DWORD result  = GetIfEntry ( &IfRow );
-                std::string sAdapter = "Unknown";
                 if ( result == 0 )
                 {
                     sAdapter = (char*)IfRow.bDescr;
+#elifdef __APPLE__
+                char ifname[IF_NAMESIZE] = {0};
+                if ( if_indextoname(interfaceIndex, ifname) != nullptr )
+                {
+                    sAdapter = ifname;
+                }
+                {
+#endif
                     DNSServiceErrorType err = DNSServiceGetAddrInfo( &client, kDNSServiceFlagsTimeout, interfaceIndex, kDNSServiceProtocol_IPv4, hosttarget, get_address, context );
 
                     if ( err == 0 )

@@ -34,6 +34,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	list(APPEND DNS_SOURCES "src/windows/bonjourbrowser.cpp" "src/windows/bonjourpublisher.cpp")
 endif()
 
+if(APPLE)
+	#macOS ships dns_sd.h in the SDK and DNSServiceRef symbols in libSystem;
+	#reuse the Bonjour sources used on Windows.
+	list(APPEND DNS_SOURCES "src/windows/bonjourbrowser.cpp" "src/windows/bonjourpublisher.cpp")
+endif()
+
 
 add_library(pml_dnssd SHARED ${DNS_SOURCES} ${CMAKE_BINARY_DIR}/src/pml_dnssd_version.cpp)
 set_target_properties(pml_dnssd PROPERTIES DEBUG_POSTFIX "d")
@@ -64,7 +70,6 @@ endif()
 target_compile_options(pml_dnssd PRIVATE ${flags})
 target_link_directories(pml_dnssd PRIVATE ${CMAKE_SOURCE_DIR}/lib)
 target_link_libraries(pml_dnssd optimized pml_log debug pml_logd)
-target_link_libraries(pml_dnssd avahi-client)
 
 #linux specific
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

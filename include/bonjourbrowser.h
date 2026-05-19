@@ -1,7 +1,7 @@
 #ifndef PML_DNSSD_BONJOURBROWSER_H
 #define PML_DNSSD_BONJOURBROWSER_H
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 
 #include <atomic>
 #include <list>
